@@ -36,13 +36,15 @@ class GameState with ChangeNotifier {
       _addError('A hex string have 6 characters, not ${input.length}');
       return;
     }
-    String hex = hexString.toLowerCase();
-    Color inputColor = HexColor.fromHex(input);
-    Color hexColor = HexColor.fromHex(hexString);
-    LabColor labInput = LabColor.fromRGB(inputColor.red, inputColor.green, inputColor.blue);
-    LabColor labHex = LabColor.fromRGB(hexColor.red, hexColor.green, hexColor.blue);
-    _addDistance(deltaE(labInput, labHex).toString());
-    _win('#${input.toLowerCase()}' == hex);
+    try {
+      String hex = hexString.toLowerCase();
+      Color inputColor = HexColor.fromHex(input);
+      Color hexColor = HexColor.fromHex(hexString);
+      LabColor labInput = LabColor.fromRGB(inputColor.red, inputColor.green, inputColor.blue);
+      LabColor labHex = LabColor.fromRGB(hexColor.red, hexColor.green, hexColor.blue);
+      _addDistance(deltaE(labInput, labHex).toString());
+      _win('#${input.toLowerCase()}' == hex);
+    } catch(_) {_addError('Not a valid hex');}
   }
 
   void reset() {
