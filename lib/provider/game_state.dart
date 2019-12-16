@@ -59,6 +59,7 @@ class GameState with ChangeNotifier {
   @override
   void dispose() {
     _hint.close();
+    _didWin.close();
     super.dispose();
   }
 }
