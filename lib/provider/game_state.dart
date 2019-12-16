@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:delta_e/delta_e.dart';
 import 'package:flutter/material.dart';
 import 'package:guess_the_hex/extentions/color.dart';
 import 'package:rxdart/subjects.dart';
@@ -18,15 +19,30 @@ class GameState with ChangeNotifier {
   Stream<String> get hint => _hint.stream;
   Function(String) get _hintInput => _hint.sink.add;
 
+  BehaviorSubject<String> _distance = BehaviorSubject<String>();
+  Stream<String> get distance => _distance.stream;
+  Function(String) get _addDistance => _distance.sink.add;
+
+  BehaviorSubject<String> _error = BehaviorSubject<String>();
+  Stream<String> get error => _error.stream;
+  Function(String) get _addError => _error.sink.add;
 
   GameState() {
     reset();
   }
 
   void guess() {
-    input = '#${input.toLowerCase()}';
+    if (input.isEmpty || input.length < 6) {
+      _addError('A hex string have 6 characters, not ${input.length}');
+      return;
+    }
     String hex = hexString.toLowerCase();
-    _win(input == hex);
+    Color inputColor = HexColor.fromHex(input);
+    Color hexColor = HexColor.fromHex(hexString);
+    LabColor labInput = LabColor.fromRGB(inputColor.red, inputColor.green, inputColor.blue);
+    LabColor labHex = LabColor.fromRGB(hexColor.red, hexColor.green, hexColor.blue);
+    _addDistance(deltaE(labInput, labHex).toString());
+    _win('#${input.toLowerCase()}' == hex);
   }
 
   void reset() {
@@ -34,6 +50,8 @@ class GameState with ChangeNotifier {
     color = HexColor.fromHex(hexString);
     setWinState(WinState.none);
     _hintInput('');
+    _addError('');
+    input = '';
     notifyListeners();
   }
 
@@ -60,6 +78,8 @@ class GameState with ChangeNotifier {
   void dispose() {
     _hint.close();
     _didWin.close();
+    _distance.close();
+    _error.close();
     super.dispose();
   }
 }

@@ -64,6 +64,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.3"
+  delta_e:
+    dependency: "direct main"
+    description:
+      name: delta_e
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.0+1"
   flutter:
     dependency: "direct main"
     description: flutter

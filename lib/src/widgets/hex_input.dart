@@ -18,6 +18,13 @@ class _HexInputState extends State<HexInput> {
     super.initState();
     Future.delayed(Duration.zero, () {
       GameState gameState = Provider.of<GameState>(context);
+      gameState.error.listen((String error) {
+        if (error.isNotEmpty) {
+          Scaffold.of(context).showSnackBar(SnackBar(
+            content: Text(error, style: GoogleFonts.sourceCodePro())
+          ));
+        }
+      });
       gameState.hint.listen((String hint) {
         if (hint.isNotEmpty) Scaffold.of(context).showSnackBar(SnackBar(
           content: Row(
@@ -91,7 +98,7 @@ class _HexInputState extends State<HexInput> {
                         color: Colors.white
                       ),
                       decoration: InputDecoration(
-                        border: InputBorder.none,
+                        border: InputBorder.none
                       ),
                     ),
                   ),

@@ -18,22 +18,73 @@ class _ControlsState extends State<Controls> {
     super.initState();
     Future.delayed(Duration.zero, () {
       GameState gameState = Provider.of<GameState>(context);
+      String distance = '';
+      gameState.distance.listen((String d) {
+        distance = d;
+      });
       gameState.didWin.listen((WinState state) {
-        if (state == WinState.win) Scaffold.of(context).showSnackBar(SnackBar(
-          content: Text('Correct!'),
-          action: SnackBarAction(
-            label: 'Next challenge!',
-            onPressed: () {
-              gameState.reset();
-            },
-          ),
-        ));
-        if (state == WinState.loss) Scaffold.of(context).showSnackBar(SnackBar(
-          content: Text(
-            'Sorry! That was wrong 😅',
-            style: GoogleFonts.sourceCodePro(),
-          ),
-        ));
+        if (state == WinState.win || state == WinState.loss) {
+          String title = state == WinState.win ? 'Correct!' : 'Sorry...';
+          String correct = gameState.hexString;
+          String guess = gameState.input;
+          String _distance = distance;
+          TextStyle _style = GoogleFonts.sourceCodePro(
+            textStyle: TextStyle(color: Colors.white)
+          );
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                backgroundColor: HexColor.fromHex('212124'),
+                title: Text(title, style: _style),
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Row(children: <Widget>[
+                      CircleAvatar(backgroundColor: HexColor.fromHex(gameState.input)),
+                      Container(padding: EdgeInsets.only(right: 4)),
+                      Expanded(child: Text('Your guess: #${guess.toLowerCase()}', style: _style))
+                    ]),
+                    Container(padding: EdgeInsets.only(top: 8)),
+                    Row(children: <Widget>[
+                      CircleAvatar(backgroundColor: gameState.color),
+                      Container(padding: EdgeInsets.only(right: 4)),
+                      Expanded(child: Text('Correct color: ${correct.toLowerCase()}', style: _style))
+                    ]),
+                    Container(padding: EdgeInsets.only(top: 8)),
+                    Text('Distance: $_distance*', style: _style),
+                    Container(padding: EdgeInsets.only(top: 16)),
+                    Text(
+                      '*closer to 0 is better',
+                      style: GoogleFonts.sourceCodePro(
+                        fontSize: 12,
+                        textStyle: TextStyle(color: Colors.white)
+                      ),
+                    )
+                  ],
+                ),
+                actions: <Widget>[
+                  FlatButton(
+                    textColor: Colors.grey,
+                    child: Text('Cancel'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  FlatButton(
+                    textColor: Colors.yellowAccent,
+                    child: Text('Next Challenge'),
+                    onPressed: () {
+                      gameState.reset();
+                      Navigator.of(context).pop();
+                    },
+                  )
+                ],
+              );
+            }
+          );
+        }
       });
     });
   }
